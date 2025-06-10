@@ -1,0 +1,37 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pillow
+
+      - name: Build .app
+        run: |
+          pyinstaller --onefile --windowed esavi_tkinter_validado.py
+
+      - name: Zip the .app
+        run: |
+          cd dist
+          zip -r EsAvI-A-mac.zip esavi_tkinter_validado.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: EsAvI-A-mac
+          path: dist/EsAvI-A-mac.zip
